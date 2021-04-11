@@ -2,9 +2,7 @@ FROM php:fpm-alpine
 
 LABEL maintainer="Tony <i@tony.moe>"
 
-RUN curl -sS https://getcomposer.org/installer | php \
-  \
-  && apk add --no-cache --virtual .build-deps \
+RUN apk add --no-cache --virtual .build-deps \
     autoconf \
     freetype-dev \
     gettext-dev \
