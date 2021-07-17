@@ -34,7 +34,6 @@ RUN apk add --no-cache --virtual .build-deps \
     soap \
     sockets \
     tidy \
-    xmlrpc \
     zip \
   && pecl install redis \
   && pecl install imagick \
