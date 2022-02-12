@@ -2,6 +2,8 @@ FROM php:fpm-alpine
 
 LABEL maintainer="Tony <i@tony.moe>"
 
+ENV CFLAGS="$CFLAGS -D_GNU_SOURCE"
+
 RUN apk add --no-cache --virtual .build-deps \
     autoconf \
     freetype-dev \
