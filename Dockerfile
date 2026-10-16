@@ -1,10 +1,9 @@
-FROM php:fpm-alpine
+FROM php:fpm-alpine AS build-deps
 
 LABEL maintainer="Tony <i@tony.moe>"
 
-ENV CFLAGS="$CFLAGS -D_GNU_SOURCE"
-
 RUN apk add --no-cache --virtual .build-deps \
+  $PHPIZE_DEPS \
     autoconf \
     freetype-dev \
     gettext-dev \
@@ -15,21 +14,21 @@ RUN apk add --no-cache --virtual .build-deps \
     libpng-dev \
     libxml2-dev \
     libzip-dev \
+    linux-headers \
     make \
     pcre-dev \
     postgresql-dev \
     tidyhtml-dev \
+  && PHPIZE_DEPS='' \
+  && export PHPIZE_DEPS \
   && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
-  && docker-php-ext-configure opcache --enable-opcache \
   && docker-php-ext-install \
     bcmath \
     exif \
     gd \
     gettext \
-    iconv \
     intl \
     mysqli \
-    opcache \
     pdo_mysql \
     pdo_pgsql \
     pgsql \
@@ -38,14 +37,16 @@ RUN apk add --no-cache --virtual .build-deps \
     tidy \
     zip \
   && pecl install redis \
-  && pecl install imagick \
-  && docker-php-ext-enable \
-    redis \
-    imagick \
-  \
-  && apk del .build-deps \
-  \
-  && runDeps=$( \
+  && pecl install imagick
+
+RUN docker-php-ext-enable redis imagick
+
+FROM php:fpm-alpine
+
+COPY --from=build-deps /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+COPY --from=build-deps /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
+
+RUN runDeps=$( \
     scanelf --needed --nobanner --format '%n#p' /usr/local/lib/php/extensions/*/*.so \
       | tr ',' '\n' \
       | sort -u \
