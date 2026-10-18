@@ -1,0 +1,6 @@
+*
+!Dockerfile
+!php
+!php/**
+!php-fpm.d
+!php-fpm.d/**
