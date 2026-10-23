@@ -1,4 +1,4 @@
-FROM php:fpm-alpine AS build-deps
+FROM php:8.5.12-fpm-alpine AS build-deps
 
 LABEL maintainer="Tony <i@tony.moe>"
 
@@ -41,7 +41,7 @@ RUN apk add --no-cache --virtual .build-deps \
 
 RUN docker-php-ext-enable redis imagick
 
-FROM php:fpm-alpine
+FROM php:8.5.12-fpm-alpine
 
 COPY --from=build-deps /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
 COPY --from=build-deps /usr/local/etc/php/conf.d/ /usr/local/etc/php/conf.d/
